@@ -1,3 +1,4 @@
+import axios from "axios";
 import { FormEvent, useContext, useState } from "react"
 import { UserContext, UserType } from "./userReducer"
 import { Button, Container, Modal, Paper, TextField } from '@mui/material'
@@ -12,16 +13,26 @@ const Update = () =>{
         setForm({...form,[name]:value})
     }
 
-    const handleSubmit = (e: FormEvent)=>{
+    const handleSubmit = async (e: FormEvent)=>{
         e.preventDefault()
-        userDispatch({
-            type:'UPDATE_USER',
-            data:form})   
-        setOpen(false)
+        try{
+            const res = await axios.put('http://localhost:3000/api/user',
+              form,
+             { headers: {
+                'user-id': user.id // כאן אנחנו מוסיפים את כותרת user-id
+            }}) 
+            userDispatch({
+             type:'UPDATE_USER',
+             data:form}) 
+             setOpen(false)  
+        }catch(e){
+            if(axios.isAxiosError(e) && e.status === 404)
+                alert("user dont find")
+        }
     }
     return(<>
-        <Button variant="outlined" size="small" onClick={()=>setOpen(true)}
-                sx={{ marginLeft:2}} endIcon={<ModeIcon/>}>UPDATE</Button>
+        <Button  size="small" onClick={()=>setOpen(true)} //variant="outlined" 
+                sx={{ marginLeft:2,marginTop:2}} endIcon={<ModeIcon/>}>UPDATE</Button>
         <Modal
          open={open}
          onClose={() => { setOpen(false) }}
@@ -32,9 +43,14 @@ const Update = () =>{
             <Paper elevation={3} style={{ padding: '20px' }}>
                 <form onSubmit={handleSubmit}>
                     <TextField 
-                        type="text" id="name" value={form.name} 
+                        type="text" id="firstName" value={form.firstName} 
                         onChange={(e)=>handleChange(e.target.id,e.target.value)}
-                        label="name" variant="outlined" margin="normal" fullWidth>
+                        label="firstName" variant="outlined" margin="normal" fullWidth>
+                    </TextField>
+                    <TextField 
+                        type="text" id="lastName" value={form.lastName} 
+                        onChange={(e)=>handleChange(e.target.id,e.target.value)}
+                        label="lastName" variant="outlined" margin="normal" fullWidth>
                     </TextField>
                     <TextField 
                         type="text" id="email" value={form.email} 

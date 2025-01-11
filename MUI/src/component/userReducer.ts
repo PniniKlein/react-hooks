@@ -1,8 +1,10 @@
 import { createContext, Dispatch } from "react"
 
 export type UserType ={
-    name:string
-    email?: string,
+    id:number
+    firstName?:string
+    lastName?:string
+    email: string,
     password: string,
     address?:string,
     phone?: string,
@@ -16,22 +18,34 @@ export const UserContext = createContext<{
     user: UserType;
     userDispatch: Dispatch<Action>
 }>({
-    user:{name:'',email:'',password:'',address:'',phone:''},
+    user:{id:0,firstName:'',lastName:'',email:'',password:'',address:'',phone:''},
     userDispatch:()=>null
 })
 
 export default (state: UserType, action:Action) => {
-    switch(action.type){
+
+    switch(action.type){ 
         case 'CREATE_USER':
             return {
-                name: action.data.name,
-                email: action.data.email? state.email : '',
+                id: action.data.id,
+                firstName: action.data.firstName? action.data.firstName : '',
+                lastName: action.data.lastName? action.data.lastName : '',
+                email: action.data.email,
                 password: action.data.password,
-                address: action.data.address? state.address:'',
-                phone: action.data.phone? state.phone:'',
+                address: action.data.address? action.data.address:'',
+                phone: action.data.phone? action.data.phone:''
             }
         case 'UPDATE_USER':
-            return action.data
+             return action.data
+            // {
+            //     id: state.id,
+            //     firstName: action.data.firstName? action.data.firstName : '',
+            //     lastName: action.data.lastName? action.data.lastName : '',
+            //     email: action.data.email,
+            //     password: action.data.password,
+            //     address: action.data.address? action.data.address:'',
+            //     phone: action.data.phone? action.data.phone:'',
+            // }
         default:
             return state
     }
